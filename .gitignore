@@ -1,0 +1,26 @@
+node_modules/
+out/
+*.vsix
+*.zip
+*.log
+*.tsbuildinfo
+__pycache__/
+*.pyc
+.DS_Store
+Thumbs.db
+
+# Test sources are tracked; generated fixtures, results and VS Code profiles are not.
+/test/*
+!/test/*.cjs
+!/test/*.ps1
+!/test/XQt4PrinterChecks.py
+!/test/folderless-reference-qa/
+!/test/folderless-reference-qa/**
+!/test/target source/
+!/test/target source/**
+!/test/run source/
+!/test/run source/**
+!/test/smoke source/
+!/test/smoke source/**
+/test/test-temp/
+/test/temporary/
