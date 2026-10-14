@@ -6,7 +6,7 @@ Windows용 개인 VS Code 확장입니다. 폴더를 먼저 열지 않고 `.pro`
 
 기존 `.pro/.pri`의 빌드 규칙을 그대로 사용하며, 확장의 설정은 프로젝트 밖의 VS Code 사용자 데이터에 저장합니다. Qt 4.8.1과 구형 MinGW를 사용하는 프로젝트도 다룰 수 있습니다.
 
-[설치](#설치) · [빠른 시작](#빠른-시작) · [사용 가이드](docs/USAGE.md) · [Codex 제어](https://github.com/linehad/qt-pro-workbench/blob/HEAD/CODEX-CONTROL.md)
+[설치](#설치) · [빠른 시작](#빠른-시작) · [사용 가이드](docs/USAGE.md) · [Codex 제어](CODEX-CONTROL.md)
 
 ## 주요 기능
 
@@ -38,7 +38,7 @@ Qt, CMake, 컴파일러는 별도로 설치해야 합니다. Qt Extension Pack�
 이 확장은 개인용 VSIX로 설치하며 Marketplace에 게시하지 않습니다.
 
 1. 설치할 `.vsix` 패키지를 준비합니다. 소스에서 만들려면 아래 [개발·패키징](#개발패키징)을 참고하세요.
-2. VS Code에서 **Ctrl+Shift+X → ⋯ → VSIX에서 설치…**를 선택합니다.
+2. VS Code에서 <strong>Ctrl+Shift+X → ⋯ → VSIX에서 설치…</strong>를 선택합니다.
 3. 패키지를 지정하고, Microsoft C/C++ 확장이 없으면 함께 설치합니다.
 4. **Developer: Reload Window**로 창을 다시 불러옵니다. 업데이트 후에도 한 번 실행하세요.
 
@@ -46,9 +46,9 @@ Windows에서 `.vsix`를 더블클릭하면 Visual Studio용 설치 관리자가
 
 ## 빠른 시작
 
-1. **프로젝트 열기** — `Ctrl+Shift+P` → **Qt Pro: Open Project (.pro)**를 실행합니다. `.pro`를 편집기로 열어도 자동 등록됩니다. CMake는 **Qt Projects의 + → CMakeLists.txt**로 엽니다.
-2. **키트 선택** — 하단 **프로젝트 이름 ▾** → **Project Settings → Project / Kit**에서 선택합니다. 키트가 없으면 **키트 관리…**에서 자동 검색하거나 경로를 지정하세요.
-3. **빌드 구성 선택** — 하단 **Debug / Release ▾**에서 구성을 선택합니다. 인수나 빌드 폴더는 **Build Settings**에서 지정합니다.
+1. **프로젝트 열기** — `Ctrl+Shift+P` → <strong>Qt Pro: Open Project (.pro)</strong>를 실행합니다. `.pro`를 편집기로 열어도 자동 등록됩니다. CMake는 **Qt Projects의 + → CMakeLists.txt**로 엽니다.
+2. **키트 선택** — 하단 **프로젝트 이름 ▾** → **Project Settings → Project / Kit**에서 선택합니다. 키트가 없으면 <strong>키트 관리…</strong>에서 자동 검색하거나 경로를 지정하세요.
+3. **빌드 구성 선택** — 하단 <strong>Debug / Release ▾</strong>에서 구성을 선택합니다. 인수나 빌드 폴더는 **Build Settings**에서 지정합니다.
 4. **빌드** — 하단 **빌드** 버튼 또는 **Ctrl+Shift+B**를 누릅니다.
 5. **실행·디버깅** — 하단 **▶ / Ctrl+F5**로 실행하거나 **F5**로 디버깅합니다. 실행 파일·인수·작업 폴더는 **Run Settings**에서 지정합니다.
 
@@ -72,7 +72,7 @@ Windows에서 `.vsix`를 더블클릭하면 Visual Studio용 설치 관리자가
 
 Codex에서 **$vscode-qt-control**을 지정하거나, `%LOCALAPPDATA%/QtProWorkbench/control-api/QtControl.ps1`의 `qt_list_instances`와 `help`로 시작하세요. 프로젝트·키트 선택, 빌드, 중단점 설정, 변수 조회와 단계 실행을 제어할 수 있습니다.
 
-호출 예제는 [CODEX-CONTROL.md](https://github.com/linehad/qt-pro-workbench/blob/HEAD/CODEX-CONTROL.md)에 있습니다.
+호출 예제는 [CODEX-CONTROL.md](CODEX-CONTROL.md)에 있습니다.
 
 ## 개발·패키징
 
@@ -94,5 +94,5 @@ npm 런타임 패키지는 사용하지 않습니다. Git에는 소스·리소�
 ## 문서·라이선스
 
 - [사용 가이드](docs/USAGE.md): 프로젝트 탐색, 키트, 빌드·배포·실행, 디버깅과 개인 설정
-- [Codex 제어 가이드](https://github.com/linehad/qt-pro-workbench/blob/HEAD/CODEX-CONTROL.md): 로컬 API와 호출 예제
-- [MIT 라이선스](https://github.com/linehad/qt-pro-workbench/blob/HEAD/LICENSE)
+- [Codex 제어 가이드](CODEX-CONTROL.md): 로컬 API와 호출 예제
+- [MIT 라이선스](LICENSE)
