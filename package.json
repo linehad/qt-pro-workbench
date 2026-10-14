@@ -1,0 +1,158 @@
+{
+    "name": "qt-pro-workbench",
+    "displayName": "Qt Pro Workbench (Local)",
+    "description": "Local qmake/CMake project tree, Qt/compiler kits, build settings, incremental builds and debugging. Settings stay outside projects.",
+    "version": "0.12.4",
+    "publisher": "ynlim",
+    "private": true,
+    "license": "MIT",
+    "engines": { "vscode": "^1.100.0" },
+    "categories": ["Other"],
+    "main": "./out/XExtension.js",
+    "extensionKind": ["ui"],
+    "capabilities": { "untrustedWorkspaces": { "supported": "limited", "description": "파일 트리만 제공하며 신뢰하지 않는 프로젝트의 빌드는 실행하지 않습니다." } },
+    "activationEvents": ["onStartupFinished", "onLanguage:qmake", "onLanguage:cmake", "onDebugResolve:qt-pro"],
+    "extensionDependencies": ["ms-vscode.cpptools"],
+    "contributes": {
+        "languages": [{ "id": "qmake", "aliases": ["Qt qmake", "qmake"], "extensions": [".pro", ".pri"], "configuration": "language-configuration.json" }, { "id": "cmake", "aliases": ["CMake", "cmake"], "filenames": ["CMakeLists.txt"], "extensions": [".cmake"], "configuration": "language-configuration.json" }],
+        "grammars": [{ "language": "qmake", "scopeName": "source.qmake", "path": "media/qmake.tmLanguage.json" }, { "language": "cmake", "scopeName": "source.cmake", "path": "media/cmake.tmLanguage.json" }],
+        "debuggers": [{
+            "type": "qt-pro", "label": "Qt Pro (qmake / CMake project)", "languages": ["qmake", "cmake"],
+            "configurationAttributes": { "launch": { "properties": { "qtProject": { "type": "string", "description": "Optional absolute .pro or CMakeLists.txt path. Defaults to the selected Qt project." } } } },
+            "initialConfigurations": [{ "type": "qt-pro", "request": "launch", "name": "Qt Pro: 선택한 프로젝트 디버그" }]
+        }],
+        "viewsContainers": { "activitybar": [{ "id": "qtProWorkbench", "title": "Qt Projects", "icon": "media/project.svg" }, { "id": "qtProReferenceResults", "title": "References", "icon": "media/references.svg" }] },
+        "views": { "qtProReferenceResults": [{ "id": "qtProReferences", "name": "References", "when": "qtPro.hasReferences" }], "qtProWorkbench": [{ "id": "qtProProjects", "name": "Qt Projects" }, { "id": "qtProBookmarks", "name": "Bookmarks" }] },
+        "viewsWelcome": [{ "view": "qtProBookmarks", "contents": "줄 번호 우클릭 → Toggle Bookmark\nCtrl+Alt+K로 북마크를 추가·해제합니다." }, { "view": "qtProProjects", "contents": "폴더를 열지 않아도 .pro / CMakeLists.txt 파일로 시작할 수 있습니다.\n[프로젝트 열기](command:qtPro.openProject)\n[최근 프로젝트](command:qtPro.openRecent)" }],
+        "commands": [
+            { "command": "qtPro.findReferences", "title": "모든 참조 찾기 (열린 프로젝트)", "category": "Qt Pro" },
+            { "command": "qtPro.refreshReferences", "title": "Refresh References", "category": "Qt Pro", "icon": "$(refresh)" },
+            { "command": "qtPro.findName", "title": "열린 프로젝트에서 이름 검색", "category": "Qt Pro" },
+            { "command": "qtPro.showControlGuide", "title": "Codex Control Guide (Codex 제어 안내)", "category": "Qt Pro" },
+            { "command": "qtPro.addProject", "title": "Add Project (.pro / CMakeLists.txt)", "category": "Qt Pro", "icon": "$(add)" },
+            { "command": "qtPro.toggleAutoReveal", "title": "현재 파일 자동 선택", "category": "Qt Pro", "icon": "$(link)", "toggled": "qtPro.autoReveal" },
+            { "command": "qtPro.revealActiveFile", "title": "Reveal Current File in Qt Projects", "category": "Qt Pro", "icon": "$(target)" },
+            { "command": "qtPro.toggleBookmark", "title": "Toggle Bookmark", "category": "Qt Pro", "icon": "$(bookmark)" },
+            { "command": "qtPro.nextBookmark", "title": "Next Bookmark", "category": "Qt Pro", "icon": "$(chevron-down)" },
+            { "command": "qtPro.previousBookmark", "title": "Previous Bookmark", "category": "Qt Pro", "icon": "$(chevron-up)" },
+            { "command": "qtPro.openBookmark", "title": "Open Bookmark", "category": "Qt Pro" },
+            { "command": "qtPro.removeBookmark", "title": "Remove Bookmark(s)", "category": "Qt Pro", "icon": "$(close)" },
+            { "command": "qtPro.renameBookmark", "title": "Rename Bookmark", "category": "Qt Pro", "icon": "$(edit)" },
+            { "command": "qtPro.openProject", "title": "Open Project (.pro / CMakeLists.txt)", "category": "Qt Pro", "icon": "$(add)" },
+            { "command": "qtPro.openRecent", "title": "Open Recent Project", "category": "Qt Pro" },
+            { "command": "qtPro.selectActiveProject", "title": "Project Settings (프로젝트 설정)", "category": "Qt Pro", "icon": "$(project)" },
+            { "command": "qtPro.selectKit", "title": "Select Qt / Compiler Kit", "category": "Qt Pro", "icon": "$(tools)" },
+            { "command": "qtPro.selectConfiguration", "title": "Select Build Configuration (빌드 구성 선택)", "category": "Qt Pro" },
+            { "command": "qtPro.build", "title": "Build Project", "category": "Qt Pro", "icon": { "light": "media/build-light.svg", "dark": "media/build.svg" } },
+            { "command": "qtPro.buildActions", "title": "Build Actions (빌드 작업 선택)", "category": "Qt Pro" },
+            { "command": "qtPro.configure", "title": "Configure Project", "category": "Qt Pro" },
+            { "command": "qtPro.qmake", "title": "Configure (qmake / CMake)", "category": "Qt Pro" },
+            { "command": "qtPro.clean", "title": "Clean Project", "category": "Qt Pro" },
+            { "command": "qtPro.rebuild", "title": "Rebuild Project", "category": "Qt Pro" },
+            { "command": "qtPro.run", "title": "Run Project", "category": "Qt Pro", "icon": "$(play)" },
+            { "command": "qtPro.debug", "title": "Debug Project", "category": "Qt Pro", "icon": "$(debug-alt)" },
+            { "command": "qtPro.selectRunTarget", "title": "Select Run Executable", "category": "Qt Pro" },
+            { "command": "qtPro.configureRun", "title": "Run Settings", "category": "Qt Pro", "icon": "$(settings)" },
+            { "command": "qtPro.configureBuild", "title": "Build Settings (빌드 설정)", "category": "Qt Pro", "icon": "$(settings)" },
+            { "command": "qtPro.configureDeploy", "title": "Deploy Settings (배포 설정)", "category": "Qt Pro", "icon": "$(settings)" },
+            { "command": "qtPro.deploy", "title": "Deploy Project", "category": "Qt Pro" },
+            { "command": "qtPro.refresh", "title": "Refresh Projects", "category": "Qt Pro", "icon": "$(refresh)" },
+            { "command": "qtPro.closeProject", "title": "Close Project", "category": "Qt Pro", "icon": "$(close)" },
+            { "command": "qtPro.editKits", "title": "Kit Settings (키트 설정)", "category": "Qt Pro", "icon": "$(settings-gear)" },
+            { "command": "qtPro.restoreCppProvider", "title": "Restore Previous C/C++ Provider", "category": "Qt Pro" },
+            { "command": "qtPro.openBuildFolder", "title": "Open Build Folder", "category": "Qt Pro" },
+            { "command": "qtPro.showDiagnostics", "title": "Show Project Parsing Notes", "category": "Qt Pro" },
+            { "command": "qtPro.showGuide", "title": "Open Usage Guide", "category": "Qt Pro" }
+        ],
+        "menus": {
+            "commandPalette": [
+                { "command": "qtPro.openBookmark", "when": "false" },
+                { "command": "qtPro.removeBookmark", "when": "false" },
+                { "command": "qtPro.renameBookmark", "when": "false" }
+            ],
+            "editor/lineNumber/context": [{ "command": "qtPro.toggleBookmark", "when": "resourceScheme == file", "group": "qtPro@1" }],
+            "editor/context": [
+                { "command": "qtPro.findReferences", "when": "editorLangId =~ /^(c|cpp)$/ && qtPro.hasActiveProject", "group": "navigation@1.1" },
+                { "command": "qtPro.findName", "when": "editorLangId =~ /^(c|cpp)$/ && qtPro.hasActiveProject", "group": "navigation@1.2" },
+                { "command": "qtPro.toggleBookmark", "when": "resourceScheme == file", "group": "qtPro@1" },
+                { "command": "qtPro.revealActiveFile", "when": "resourceScheme == file && qtPro.hasActiveProject", "group": "qtPro@2" }
+            ],
+            "view/title": [
+                { "command": "qtPro.refreshReferences", "when": "view == qtProReferences", "group": "navigation@1" },
+                { "command": "qtPro.toggleAutoReveal", "when": "view == qtProProjects", "group": "navigation@5.5" },
+                { "command": "qtPro.revealActiveFile", "when": "view == qtProProjects", "group": "navigationExtra@1" },
+                { "command": "qtPro.previousBookmark", "when": "view == qtProBookmarks", "group": "navigation@1" },
+                { "command": "qtPro.nextBookmark", "when": "view == qtProBookmarks", "group": "navigation@2" },
+                { "command": "qtPro.addProject", "when": "view == qtProProjects", "group": "navigation@1" },
+                { "command": "qtPro.refresh", "when": "view == qtProProjects", "group": "navigation@5" }
+            ],
+            "view/item/context": [
+                { "command": "qtPro.renameBookmark", "when": "view == qtProBookmarks && viewItem == qtProBookmark", "group": "bookmark@1" },
+                { "command": "qtPro.removeBookmark", "when": "view == qtProBookmarks", "group": "inline@2" },
+                { "command": "qtPro.selectActiveProject", "when": "view == qtProProjects && viewItem == qtProProject", "group": "project@1" },
+                { "command": "qtPro.selectKit", "when": "view == qtProProjects && viewItem == qtProProjectFile", "group": "kit@1" },
+                { "command": "qtPro.selectConfiguration", "when": "view == qtProProjects && viewItem == qtProProjectFile", "group": "kit@2" },
+                { "command": "qtPro.configureRun", "when": "view == qtProProjects && viewItem == qtProProjectFile", "group": "kit@3" },
+                { "command": "qtPro.configureBuild", "when": "view == qtProProjects && viewItem == qtProProjectFile", "group": "kit@2.5" },
+                { "command": "qtPro.configureDeploy", "when": "view == qtProProjects && viewItem == qtProProjectFile", "group": "kit@2.6" },
+                { "command": "qtPro.deploy", "when": "view == qtProProjects && viewItem == qtProProjectFile", "group": "build@3.5" },
+                { "command": "qtPro.build", "when": "view == qtProProjects && viewItem == qtProProjectFile", "group": "build@1" },
+                { "command": "qtPro.qmake", "when": "view == qtProProjects && viewItem == qtProProjectFile", "group": "build@1.1" },
+                { "command": "qtPro.run", "when": "view == qtProProjects && viewItem == qtProProjectFile", "group": "build@2" },
+                { "command": "qtPro.debug", "when": "view == qtProProjects && viewItem == qtProProjectFile", "group": "build@2.5" },
+                { "command": "qtPro.rebuild", "when": "view == qtProProjects && viewItem == qtProProjectFile", "group": "build@2.6" },
+                { "command": "qtPro.clean", "when": "view == qtProProjects && viewItem == qtProProjectFile", "group": "build@2.7" },
+                { "command": "qtPro.openBuildFolder", "when": "view == qtProProjects && viewItem == qtProProjectFile", "group": "build@3" },
+                { "command": "qtPro.closeProject", "when": "view == qtProProjects && viewItem == qtProProject", "group": "close@1" }
+            ],
+            "editor/title": [{ "command": "qtPro.openProject", "when": "(resourceExtname == .pro || resourceFilename == CMakeLists.txt)", "group": "navigation" }],
+            "explorer/context": [
+                { "command": "qtPro.openProject", "when": "(resourceExtname == .pro || resourceFilename == CMakeLists.txt) && resourceScheme == file && !explorerResourceIsFolder", "group": "navigation" },
+                { "command": "qtPro.build", "when": "(resourceExtname == .pro || resourceFilename == CMakeLists.txt) && resourceScheme == file && !explorerResourceIsFolder", "group": "qtPro@1" },
+                { "command": "qtPro.qmake", "when": "(resourceExtname == .pro || resourceFilename == CMakeLists.txt) && resourceScheme == file && !explorerResourceIsFolder", "group": "qtPro@2" },
+                { "command": "qtPro.rebuild", "when": "(resourceExtname == .pro || resourceFilename == CMakeLists.txt) && resourceScheme == file && !explorerResourceIsFolder", "group": "qtPro@3" },
+                { "command": "qtPro.clean", "when": "(resourceExtname == .pro || resourceFilename == CMakeLists.txt) && resourceScheme == file && !explorerResourceIsFolder", "group": "qtPro@4" },
+                { "command": "qtPro.configureRun", "when": "(resourceExtname == .pro || resourceFilename == CMakeLists.txt) && resourceScheme == file && !explorerResourceIsFolder", "group": "qtPro@5" },
+                { "command": "qtPro.configureBuild", "when": "(resourceExtname == .pro || resourceFilename == CMakeLists.txt) && resourceScheme == file && !explorerResourceIsFolder", "group": "qtPro@4.5" },
+                { "command": "qtPro.configureDeploy", "when": "(resourceExtname == .pro || resourceFilename == CMakeLists.txt) && resourceScheme == file && !explorerResourceIsFolder", "group": "qtPro@4.6" },
+                { "command": "qtPro.deploy", "when": "(resourceExtname == .pro || resourceFilename == CMakeLists.txt) && resourceScheme == file && !explorerResourceIsFolder", "group": "qtPro@4.7" }
+            ],
+            "editor/title/context": [
+                { "command": "qtPro.build", "when": "(resourceExtname == .pro || resourceFilename == CMakeLists.txt) && resourceScheme == file", "group": "qtPro@1" },
+                { "command": "qtPro.qmake", "when": "(resourceExtname == .pro || resourceFilename == CMakeLists.txt) && resourceScheme == file", "group": "qtPro@2" },
+                { "command": "qtPro.rebuild", "when": "(resourceExtname == .pro || resourceFilename == CMakeLists.txt) && resourceScheme == file", "group": "qtPro@3" },
+                { "command": "qtPro.clean", "when": "(resourceExtname == .pro || resourceFilename == CMakeLists.txt) && resourceScheme == file", "group": "qtPro@4" },
+                { "command": "qtPro.configureRun", "when": "(resourceExtname == .pro || resourceFilename == CMakeLists.txt) && resourceScheme == file", "group": "qtPro@5" },
+                { "command": "qtPro.configureBuild", "when": "(resourceExtname == .pro || resourceFilename == CMakeLists.txt) && resourceScheme == file", "group": "qtPro@4.5" },
+                { "command": "qtPro.configureDeploy", "when": "(resourceExtname == .pro || resourceFilename == CMakeLists.txt) && resourceScheme == file", "group": "qtPro@4.6" },
+                { "command": "qtPro.deploy", "when": "(resourceExtname == .pro || resourceFilename == CMakeLists.txt) && resourceScheme == file", "group": "qtPro@4.7" }
+            ]
+        },
+        "configuration": {
+            "title": "Qt Pro Workbench",
+            "properties": {
+                "qtPro.autoReveal": { "type": "boolean", "default": true, "scope": "application", "description": "Select the current editor file in Qt Projects without changing the active build/run project." },
+                "qtPro.autoOpenPro": { "type": "boolean", "default": true, "scope": "application", "description": "Open .pro / CMakeLists.txt files in the Qt project tree automatically." }
+            }
+        },
+        "configurationDefaults": {
+            "[cpp]": {
+                "editor.gotoLocation.alternativeDefinitionCommand": "editor.action.revealDeclaration",
+                "editor.gotoLocation.alternativeDeclarationCommand": "editor.action.revealDefinition"
+            }
+        },
+        "keybindings": [
+            { "command": "qtPro.findReferences", "key": "shift+f12", "when": "editorTextFocus && editorLangId =~ /^(c|cpp)$/ && qtPro.hasActiveProject" },
+            { "command": "qtPro.findReferences", "key": "shift+alt+f12", "when": "editorTextFocus && editorLangId =~ /^(c|cpp)$/ && qtPro.hasActiveProject" },
+            { "command": "qtPro.toggleBookmark", "key": "ctrl+alt+k", "when": "editorTextFocus && resourceScheme == file" },
+            { "command": "qtPro.nextBookmark", "key": "ctrl+alt+l", "when": "editorTextFocus && resourceScheme == file" },
+            { "command": "qtPro.previousBookmark", "key": "ctrl+alt+j", "when": "editorTextFocus && resourceScheme == file" },
+            { "command": "qtPro.build", "key": "ctrl+alt+b", "when": "focusedView == qtProProjects" },
+            { "command": "qtPro.build", "key": "ctrl+shift+b", "when": "qtPro.hasActiveProject" },
+            { "command": "qtPro.debug", "key": "f5", "when": "qtPro.hasActiveProject && debugState == inactive" },
+            { "command": "qtPro.run", "key": "ctrl+f5", "when": "qtPro.hasActiveProject && debugState == inactive" }
+        ]
+    },
+    "scripts": { "compile": "tsc -p .", "test": "npm run compile && node --test test/*.test.cjs" },
+    "devDependencies": { "@types/node": "^22.0.0", "@types/vscode": "^1.100.0", "typescript": "~5.9.3" }
+}
