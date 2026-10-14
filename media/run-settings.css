@@ -1,0 +1,26 @@
+body { color: var(--vscode-foreground); background: var(--vscode-editor-background); font-family: var(--vscode-font-family); padding: 24px 30px; }
+.configurations { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 28px; }
+.configurations label { padding: 0; }
+select { min-width: 180px; max-width: 320px; padding: 7px 9px; font: inherit; color: var(--vscode-dropdown-foreground); background: var(--vscode-dropdown-background); border: 1px solid var(--vscode-dropdown-border, transparent); }
+select:focus-visible { outline: 1px solid var(--vscode-focusBorder); }
+button[hidden] { display: none; }
+button:disabled { opacity: 0.5; cursor: default; }
+main { max-width: 980px; }
+h1 { font-size: 22px; font-weight: 500; margin: 0 0 14px; }
+#project { overflow-wrap: anywhere; margin-bottom: 6px; }
+#kit { color: var(--vscode-descriptionForeground); margin-top: 0; margin-bottom: 28px; }
+form { display: grid; grid-template-columns: 170px minmax(180px, 1fr); gap: 20px 14px; align-items: start; }
+label { padding-top: 7px; }
+input { width: 100%; box-sizing: border-box; background: var(--vscode-input-background); color: var(--vscode-input-foreground); border: 1px solid var(--vscode-input-border, transparent); padding: 7px 9px; font: inherit; }
+input:focus-visible, button:focus-visible { outline: 1px solid var(--vscode-focusBorder); outline-offset: 2px; }
+.path { display: flex; gap: 8px; }
+.path input { min-width: 0; flex: 1; }
+button { border: 1px solid transparent; padding: 6px 12px; white-space: nowrap; background: var(--vscode-button-secondaryBackground); color: var(--vscode-button-secondaryForeground); cursor: pointer; font: inherit; }
+button:hover { background: var(--vscode-button-secondaryHoverBackground); }
+button.primary { background: var(--vscode-button-background); color: var(--vscode-button-foreground); }
+button.primary:hover { background: var(--vscode-button-hoverBackground); }
+small { display: block; margin-top: 8px; color: var(--vscode-descriptionForeground); line-height: 1.5; }
+.wide { grid-column: 1 / -1; }
+.actions { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+#message { overflow-wrap: anywhere; }
+@media (max-width: 650px) { body { padding: 18px; } form { grid-template-columns: 1fr; gap: 8px; } label { margin-top: 10px; } .wide { margin-top: 16px; } }

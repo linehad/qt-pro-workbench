@@ -1,0 +1,40 @@
+body { margin: 0; padding: 24px 28px; font: var(--vscode-font-size, 13px) var(--vscode-font-family, sans-serif); color: var(--vscode-foreground, #ddd); background: var(--vscode-editor-background, #1e1e1e); }
+main { max-width: 1440px; margin: 0 auto; }
+h1 { font-size: 20px; font-weight: 500; margin: 0 0 18px; }
+h2 { font-size: 14px; font-weight: 600; margin: 28px 0 10px; }
+.selectors, .configuration { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.selectors select { min-width: 200px; flex: 1; }
+.selectors label:not(:first-child) { margin-left: 18px; }
+.configuration { margin: 24px 0; }
+.configuration select { min-width: 180px; margin-right: 8px; }
+nav { display: flex; border-bottom: 1px solid var(--vscode-panel-border, #414141); gap: 4px; margin-top: 20px; }
+nav button { background: transparent; border: 0; border-bottom: 2px solid transparent; border-radius: 0; padding: 10px 14px; }
+nav button[aria-selected="true"] { border-bottom-color: var(--vscode-focusBorder, #009688); color: var(--vscode-foreground, #eee); }
+fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
+[hidden] { display: none !important; }
+button, input, textarea, select { font: inherit; color: var(--vscode-input-foreground, #ddd); }
+input, textarea, select { background: var(--vscode-input-background, #303030); border: 1px solid var(--vscode-input-border, #555); border-radius: 2px; padding: 5px 8px; box-sizing: border-box; min-width: 0; }
+input:not([type="checkbox"]), textarea { width: 100%; }
+textarea { resize: vertical; min-height: 70px; font-family: var(--vscode-editor-font-family, monospace); }
+input[type="checkbox"] { accent-color: var(--vscode-focusBorder, #009688); margin: 0 6px 0 0; }
+input::placeholder, textarea::placeholder { color: var(--vscode-input-placeholderForeground, #999); }
+button { cursor: pointer; border: 1px solid var(--vscode-input-border, #555); border-radius: 2px; padding: 5px 12px; background: var(--vscode-button-secondaryBackground, #333); white-space: nowrap; }
+button:hover { background: var(--vscode-button-secondaryHoverBackground, #444); }
+button:disabled, input:disabled { opacity: .55; cursor: default; }
+button:focus-visible, input:focus, textarea:focus, select:focus { outline: 1px solid var(--vscode-focusBorder, #009688); outline-offset: 1px; }
+.box { background: var(--vscode-sideBar-background, #282828); border: 1px solid var(--vscode-panel-border, #414141); margin: 6px 0; padding: 12px 14px; }
+.fields { display: grid; grid-template-columns: 190px minmax(0, 1fr); align-items: center; gap: 10px 14px; }
+details > .fields { margin-top: 16px; }
+summary { cursor: pointer; overflow-wrap: anywhere; }
+.path { display: flex; gap: 8px; align-items: center; min-width: 0; }
+.path input { flex: 1; }
+.check { display: flex; align-items: center; }
+.hint, small { color: var(--vscode-descriptionForeground, #aaa); font-size: 12px; line-height: 1.7; overflow-wrap: anywhere; }
+small { display: block; margin-top: 5px; }
+#projectPath, #debuggerPath { overflow-wrap: anywhere; }
+.step-heading { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+footer { display: flex; gap: 10px; align-items: center; margin: 26px 0 16px; padding-top: 16px; border-top: 1px solid var(--vscode-panel-border, #414141); }
+.primary { color: var(--vscode-button-foreground, #fff); background: var(--vscode-button-background, #007acc); border-color: transparent; }
+.primary:hover { background: var(--vscode-button-hoverBackground, #168bd2); }
+#message { color: var(--vscode-descriptionForeground, #aaa); overflow-wrap: anywhere; }
+@media (max-width: 760px) { body { padding: 16px; } .fields { grid-template-columns: 1fr; gap: 7px; } .fields > span:empty { display: none; } .selectors label:not(:first-child) { margin-left: 0; } .selectors select { min-width: 150px; } .configuration { gap: 6px; } footer { flex-wrap: wrap; } }

@@ -1,0 +1,10 @@
+{
+    "scopeName": "source.qmake",
+    "patterns": [
+        { "name": "comment.line.number-sign.qmake", "match": "#.*$" },
+        { "name": "string.quoted.double.qmake", "begin": "\"", "end": "\"" },
+        { "name": "variable.other.qmake", "match": "\\$\\$(?:\\{[^}]+\\}|\\w+)" },
+        { "name": "keyword.control.qmake", "match": "\\b(?:include|load|contains|equals|CONFIG|for|else|win32|unix|macx)\\b" },
+        { "name": "support.constant.qmake", "match": "\\b[A-Z][A-Z_0-9]+\\b" }
+    ]
+}

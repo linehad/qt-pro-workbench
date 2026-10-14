@@ -1,0 +1,14 @@
+{
+    "scopeName": "source.cmake",
+    "patterns": [
+        { "name": "comment.block.cmake", "begin": "#\\[(=*)\\[", "end": "\\]\\1\\]" },
+        { "name": "comment.line.number-sign.cmake", "match": "#.*$" },
+        { "name": "string.quoted.double.cmake", "begin": "\"", "end": "\"", "patterns": [{ "name": "constant.character.escape.cmake", "match": "\\\\." }, { "include": "#variables" }] },
+        { "name": "string.quoted.other.cmake", "begin": "\\[(=*)\\[", "end": "\\]\\1\\]" },
+        { "include": "#variables" },
+        { "name": "keyword.control.cmake", "match": "(?i)\\b(?:if|elseif|else|endif|foreach|endforeach|while|endwhile|function|endfunction|macro|endmacro|return|break|continue)\\b" },
+        { "name": "support.function.cmake", "match": "\\b[A-Za-z_][A-Za-z_0-9]*(?=\\s*\\()" },
+        { "name": "constant.language.cmake", "match": "(?i)\\b(?:ON|OFF|TRUE|FALSE|YES|NO|REQUIRED|PRIVATE|PUBLIC|INTERFACE|CACHE)\\b" }
+    ],
+    "repository": { "variables": { "patterns": [{ "name": "variable.other.cmake", "match": "\\$(?:ENV|CACHE)?\\{[^}]+\\}" }, { "name": "variable.other.cmake", "begin": "\\$<", "end": ">", "patterns": [{ "include": "#variables" }] }] } }
+}

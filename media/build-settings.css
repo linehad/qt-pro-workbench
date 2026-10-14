@@ -1,0 +1,10 @@
+@import url("run-settings.css");
+form { display: block; }
+h2 { font-size: 16px; font-weight: 500; margin: 28px 0 18px; border-bottom: 1px solid var(--vscode-widget-border, #6664); padding-bottom: 10px; }
+.fields { display: grid; grid-template-columns: 170px minmax(180px, 1fr); gap: 20px 14px; align-items: start; }
+.check { display: flex; align-items: center; gap: 8px; }
+input[type="checkbox"] { width: auto; accent-color: var(--vscode-focusBorder); }
+input:disabled, button:disabled { opacity: 0.55; cursor: default; }
+textarea { width: 100%; box-sizing: border-box; background: var(--vscode-input-background); color: var(--vscode-input-foreground); border: 1px solid var(--vscode-input-border, transparent); padding: 7px 9px; font: inherit; resize: vertical; }
+textarea:focus-visible { outline: 1px solid var(--vscode-focusBorder); outline-offset: 2px; }
+@media (max-width: 650px) { .fields { grid-template-columns: 1fr; gap: 8px; } }
