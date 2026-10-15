@@ -7,6 +7,7 @@ import { loadReferenceSession, saveReferenceSession, restoreReferenceDocuments }
 import { TXProjectTree } from "./XProjectTree";
 import { TXProjectNavigation } from "./XProjectNavigation";
 import { TXBookmarks } from "./XBookmarks";
+import { TXGitHistory } from "./XGitHistory";
 import { TXBuildController } from "./XBuildController";
 import { TXBuildActions } from "./XBuildActions";
 import { TXIntelliSense } from "./XIntelliSense";
@@ -53,6 +54,7 @@ class TXWorkbench {
     private readonly controlServer: TXLocalControlServer;
     private readonly buildActions = new TXBuildActions();
     private readonly projectActions = new TXProjectActions();
+    private readonly gitHistory: TXGitHistory;
     private cppRefreshTimer: NodeJS.Timeout | undefined;
     private globalWrites = Promise.resolve();
     private readonly output = vscode.window.createOutputChannel("Qt Pro");
@@ -450,6 +452,21 @@ class TXWorkbench {
         }));
     }
 
+    private async revealInExplorer(node?: ProjectCommandTarget): Promise<void> {
+        let file: string | undefined;
+        if (node && "scheme" in node) {
+            if (node.scheme !== "file") { throw new Error("탐색기에서 열 로컬 파일을 선택하세요."); }
+            file = node.fsPath;
+        } else if (node) { file = node.filePath ?? node.partPath ?? node.directoryPath ?? node.projectPath; }
+        else {
+            const uri = vscode.window.activeTextEditor?.document.uri;
+            file = uri?.scheme === "file" ? uri.fsPath : this.activeProject;
+        }
+        if (!file) { throw new Error("탐색기에서 열 프로젝트 또는 파일을 선택하세요."); }
+        if (!fs.existsSync(file)) { throw new Error(`로컬 파일 또는 폴더를 찾을 수 없습니다: ${file}`); }
+        await vscode.commands.executeCommand("revealFileInOS", vscode.Uri.file(path.resolve(file)));
+    }
+
     private async openBuildFolder(node?: ProjectCommandTarget): Promise<void> {
         const projectPath = await this.chooseProject(node);
         if (!projectPath) { return; }
@@ -464,7 +481,9 @@ class TXWorkbench {
         const projectPath = await this.chooseProject(node);
         if (!projectPath) { return; }
         this.tree.remove(projectPath);
-        this.activeProject = this.tree.projects()[0];
+        const projects = this.tree.projects();
+        const hasActiveProject = this.activeProject ? projects.some(project => project.toLowerCase() === this.activeProject!.toLowerCase()) : false;
+        if (!hasActiveProject) { this.activeProject = projects[0]; }
         if (this.activeProject) { this.tree.setActive(this.activeProject); }
         await this.persistProjects();
         this.updateStatus();
@@ -522,6 +541,10 @@ class TXWorkbench {
         this.register("qtPro.findReferences", (uri?: vscode.Uri, position?: vscode.Position) => this.references.findReferences(uri, position));
         this.register("qtPro.refreshReferences", () => this.references.refresh());
         this.register("qtPro.findName", (name?: string) => this.references.findName(name));
+        this.register("qtPro.showGitHistory", (node?: ProjectCommandTarget) => this.gitHistory.showGraph(node, this.activeProject));
+        this.register("qtPro.showFileGitHistory", (node?: ProjectCommandTarget) => this.gitHistory.showFileHistory(node));
+        this.register("qtPro.compareLatestGitRevision", (node?: ProjectCommandTarget) => this.gitHistory.showLatestDiff(node));
+        this.register("qtPro.revealInExplorer", (node?: ProjectCommandTarget) => this.revealInExplorer(node));
         this.register("qtPro.refresh", () => this.tree.refresh());
         this.register("qtPro.revealActiveFile", () => this.navigation.reveal());
         this.register("qtPro.toggleAutoReveal", () => this.navigation.toggle());
@@ -544,6 +567,7 @@ class TXWorkbench {
 
     public constructor(context: vscode.ExtensionContext) {
         this.context = context;
+        this.gitHistory = new TXGitHistory(context.extensionUri);
         this.storagePath = context.globalStorageUri.fsPath;
         this.kitsPath = path.join(this.storagePath, "kits.json");
         fs.mkdirSync(this.storagePath, { recursive: true });
@@ -586,17 +610,20 @@ class TXWorkbench {
         this.projectStatus.command = "qtPro.selectActiveProject";
         this.references = new TXReferences({ storage: this.storagePath, projects: () => this.tree.projects(), getProject: project => this.tree.getProject(project), activeProject: () => this.activeProject });
         context.subscriptions.push(this.references);
+        context.subscriptions.push(this.gitHistory);
         this.registerCommands();
         this.registerDebugger();
         this.control = new TXWorkbenchControl({
             state: () => this.projectSettingsController().state(),
             openProject: project => this.openProject(vscode.Uri.file(project), false),
+            closeProject: project => this.closeProject(vscode.Uri.file(project)),
             select: async change => {
                 await this.projectSettingsController().select(change);
                 for (const [panel, controller] of this.projectSettingsViews) { await panel.webview.postMessage({ type: "state", state: controller.state() }); }
             },
             build: (project, operation) => operation === "deploy" ? this.deploy(vscode.Uri.file(project)) : this.build(vscode.Uri.file(project), false, (operation === "configure" ? "qmake" : operation) as BuildOperation),
-            debug: async (project, stopAtEntry) => vscode.debug.startDebugging(undefined, { type: "qt-pro", request: "launch", name: "Qt Pro", qtProject: project, qtControl: true, stopAtEntry })
+            debug: async (project, stopAtEntry) => vscode.debug.startDebugging(undefined, { type: "qt-pro", request: "launch", name: "Qt Pro", qtProject: project, qtControl: true, stopAtEntry }),
+            git: (operation, args) => this.gitHistory.control(operation, args, this.activeProject)
         });
         this.controlServer = new TXLocalControlServer(request => this.controlRequest(request));
         context.subscriptions.push(this.control, this.controlServer);

@@ -97,6 +97,7 @@ export class TXProjectTree implements vscode.TreeDataProvider<ProjectNode>, vsco
             const item = new vscode.TreeItem(node.label, vscode.TreeItemCollapsibleState.None);
             item.id = projectNodeId(node);
             const fileUri = vscode.Uri.file(node.filePath!);
+            item.contextValue = "qtProSourceFile";
             if (node.filePath && isProjectFile(node.filePath)) { item.contextValue = "qtProProjectFile"; }
             item.resourceUri = node.isInactive ? fileUri.with({ query: "qtProInactive=1" }) : fileUri;
             item.tooltip = node.isInactive ? `${node.filePath}\n이 .pri 조건에서 비활성인 파일` : node.filePath;
@@ -114,10 +115,12 @@ export class TXProjectTree implements vscode.TreeDataProvider<ProjectNode>, vsco
             item.description = node.projectPath === this.activePath ? "활성" : undefined;
         }
         if (node.kind === "include") {
+            item.contextValue = "qtProInclude";
             item.iconPath = new vscode.ThemeIcon("library", new vscode.ThemeColor("charts.green"));
             item.tooltip = node.partPath;
         }
         if (node.kind === "folder") {
+            item.contextValue = "qtProFolder";
             item.resourceUri = vscode.Uri.file(node.directoryPath!);
             item.tooltip = node.directoryPath;
         }

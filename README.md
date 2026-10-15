@@ -1,98 +1,202 @@
 # Qt Pro Workbench
 
-**VS Code에서 Qt 프로젝트를 열고, 키트를 선택해 빌드·실행·디버깅하세요.**
+**Windows의 VS Code에서 qmake·CMake 프로젝트를 열고 빌드·실행·디버깅하는 확장입니다.** 폴더를 먼저 열지 않아도 `.pro` 또는 `CMakeLists.txt` 파일로 시작할 수 있습니다.
 
-Windows용 개인 VS Code 확장입니다. 폴더를 먼저 열지 않고 `.pro` 또는 `CMakeLists.txt`로 프로젝트를 시작할 수 있습니다. 프로젝트 트리, Qt·컴파일러 키트, 빌드·배포·실행 설정을 한 화면에서 관리합니다.
-
-기존 `.pro/.pri`의 빌드 규칙을 그대로 사용하며, 확장의 설정은 프로젝트 밖의 VS Code 사용자 데이터에 저장합니다. Qt 4.8.1과 구형 MinGW를 사용하는 프로젝트도 다룰 수 있습니다.
-
-[설치](#설치) · [빠른 시작](#빠른-시작) · [사용 가이드](docs/USAGE.md) · [Codex 제어](CODEX-CONTROL.md)
+Qt Creator처럼 프로젝트 트리에서 소스를 탐색하고, 사용할 Qt와 컴파일러를 선택해 작업할 수 있습니다. 키트와 실행 설정은 프로젝트 밖의 VS Code 개인 저장소에 보관하므로, 개인 설정 파일을 저장소에 추가하지 않고 사용할 수 있습니다.
 
 ## 주요 기능
 
-| 기능 | 할 수 있는 일 |
-| --- | --- |
-| 프로젝트 탐색 | `.pro`, 중첩 `.pri`, `SUBDIRS`, 리소스 파일을 트리로 탐색하고 현재 편집 파일을 따라갑니다. |
-| 키트 관리 | Qt·컴파일러·make·GDB 경로를 관리하고, 설치된 키트를 찾거나 Qt Creator 설정을 최초 한 번 가져옵니다. |
-| 빌드·배포·실행 | Debug/Release와 사용자 빌드 구성, 여러 실행 프로그램, 파일·폴더 복사 단계를 관리합니다. |
-| C++ 편집·디버깅 | Microsoft C/C++와 연결해 IntelliSense, 선언·정의 이동, 참조 검색과 디버깅을 제공합니다. Qt 4.8.1용 Qt 변수 표시기를 포함합니다. |
-| CMake | Configure, Build, Clean을 실행하고 CMake File API의 소스·실행 대상·컴파일 정보를 사용합니다. |
-| Codex 제어 | 로컬 API로 프로젝트 선택, 빌드, 중단점, 스택·변수 조회와 디버거 조작을 제공합니다. |
+- **프로젝트 탐색**: `.pro`, 포함된 `.pri`, `SUBDIRS` 하위 프로젝트와 CMake 프로젝트를 트리로 표시합니다.
+- **빌드·실행·디버깅**: 프로젝트별 키트와 빌드 구성을 선택하고, 상태 표시줄이나 단축키로 실행합니다.
+- **코드 탐색**: Microsoft C/C++ 확장에 분석 설정을 제공하고, 선언·정의 이동과 열린 프로젝트 범위의 참조 검색을 지원합니다.
+- **작업 편의 기능**: 현재 파일 따라가기, 줄 북마크, Git 이력 조회와 버전 비교를 제공합니다.
+- **실행·배포 설정**: 여러 실행 프로그램, 실행 인수, 작업 폴더와 파일·폴더 복사 단계를 관리합니다.
+- **Codex 연동**: 로컬 제어 API로 프로젝트·빌드·디버거를 조작할 수 있습니다.
 
-북마크와 최근 프로젝트도 개인 저장소에 유지합니다. 프로젝트에 `.vscode`, `.qtide`, `.code-workspace` 설정 파일을 만들지 않습니다.
+## 설치 전 준비
 
-## 지원 환경
-
-| 항목 | 요구 사항·범위 |
+| 항목 | 필요한 환경 |
 | --- | --- |
 | 운영체제 | Windows |
 | 편집기 | VS Code 1.100 이상 |
-| 필수 확장 | Microsoft C/C++ (`ms-vscode.cpptools`) |
-| qmake 프로젝트 | Windows MinGW. Qt 4.8.1 / 구형 MinGW 32비트, Qt 5.15.19 / MinGW 8.1 32·64비트, Qt 6.11.0 / MinGW 13.1 64비트 설치를 자동 발견합니다. 다른 설치 경로는 키트 설정에서 지정할 수 있습니다. |
-| CMake 프로젝트 | CMake File API는 CMake 3.14 이상, 컴파일러 자동 조회는 3.20 이상. GDB 또는 MSVC 디버거를 사용합니다. Ninja/NMake + MSVC의 개발 환경은 키트 환경변수에 직접 지정해야 합니다. |
+| 필수 확장 | Microsoft C/C++ (`ms-vscode.cpptools`), Git Graph (`mhutchie.git-graph`) |
+| qmake 프로젝트 | Qt의 `qmake.exe`, 호환되는 MinGW 컴파일러와 `mingw32-make.exe` |
+| CMake 프로젝트 | CMake, 사용할 생성기(Ninja 등)와 컴파일러 |
+| 디버깅 | MinGW 키트는 GDB, CMake의 MSVC 키트는 C/C++ 확장의 Visual Studio 디버거 |
+| Git 이력 | Git 실행 파일 |
 
-Qt, CMake, 컴파일러는 별도로 설치해야 합니다. Qt Extension Pack은 필요하지 않습니다. UI 디자이너와 Qt Creator 수준의 코드 모델은 포함하지 않습니다.
+Qt SDK, 컴파일러, CMake, GDB는 VSIX에 포함되지 않습니다. 사용할 도구를 먼저 설치하세요. **키트(Kit)**란 Qt·컴파일러·빌드 도구·디버거 경로를 묶은 설정입니다. Qt와 컴파일러의 버전 및 32/64비트 구성이 서로 호환되어야 합니다.
+
+qmake 프로젝트는 Windows MinGW 구성을 지원합니다. CMake 프로젝트는 MinGW와 MSVC 키트를 사용할 수 있습니다. Ninja/NMake와 MSVC를 함께 사용할 때는 키트 환경변수에 MSVC 개발 환경을 지정해야 합니다. MSVC 환경을 자동으로 초기화하지는 않습니다.
+
+CMake File API에는 CMake 3.14 이상이 필요하며, 컴파일러 자동 조회는 3.20 이상에서 제공됩니다.
 
 ## 설치
 
-이 확장은 개인용 VSIX로 설치하며 Marketplace에 게시하지 않습니다.
+이 프로젝트는 VSIX 파일로 설치하는 로컬 확장입니다.
 
-1. 설치할 `.vsix` 패키지를 준비합니다. 소스에서 만들려면 아래 [개발·패키징](#개발패키징)을 참고하세요.
-2. VS Code에서 <strong>Ctrl+Shift+X → ⋯ → VSIX에서 설치…</strong>를 선택합니다.
-3. 패키지를 지정하고, Microsoft C/C++ 확장이 없으면 함께 설치합니다.
-4. **Developer: Reload Window**로 창을 다시 불러옵니다. 업데이트 후에도 한 번 실행하세요.
+1. VS Code에서 `Ctrl+Shift+X`로 확장 화면을 엽니다.
+2. 상단 **⋯ → VSIX에서 설치…**를 선택하고 전달받거나 직접 만든 `.vsix` 파일을 지정합니다.
+3. 필수 확장인 **Microsoft C/C++**와 **Git Graph**가 설치되었는지 확인합니다.
+4. 명령 팔레트(`Ctrl+Shift+P`)에서 **Developer: Reload Window**를 실행합니다. 업데이트 후에도 창을 다시 불러오세요.
 
-Windows에서 `.vsix`를 더블클릭하면 Visual Studio용 설치 관리자가 열릴 수 있으므로 VS Code 안에서 설치하세요. 오프라인 PC에서는 해당 VS Code 버전과 Windows 아키텍처에 맞는 Microsoft C/C++ VSIX를 먼저 설치해야 합니다.
+Windows에서 VSIX 파일을 더블클릭하면 Visual Studio용 설치 관리자가 열릴 수 있으므로 VS Code 안에서 설치하세요. 인터넷이 없는 PC에서는 해당 VS Code 버전과 Windows 아키텍처에 맞는 필수 확장의 VSIX도 준비해야 합니다.
 
-## 빠른 시작
+## 빠른 시작: 프로젝트 열기부터 첫 실행까지
 
-1. **프로젝트 열기** — `Ctrl+Shift+P` → <strong>Qt Pro: Open Project (.pro)</strong>를 실행합니다. `.pro`를 편집기로 열어도 자동 등록됩니다. CMake는 **Qt Projects의 + → CMakeLists.txt**로 엽니다.
-2. **키트 선택** — 하단 **프로젝트 이름 ▾** → **Project Settings → Project / Kit**에서 선택합니다. 키트가 없으면 <strong>키트 관리…</strong>에서 자동 검색하거나 경로를 지정하세요.
-3. **빌드 구성 선택** — 하단 <strong>Debug / Release ▾</strong>에서 구성을 선택합니다. 인수나 빌드 폴더는 **Build Settings**에서 지정합니다.
-4. **빌드** — 하단 **빌드** 버튼 또는 **Ctrl+Shift+B**를 누릅니다.
-5. **실행·디버깅** — 하단 **▶ / Ctrl+F5**로 실행하거나 **F5**로 디버깅합니다. 실행 파일·인수·작업 폴더는 **Run Settings**에서 지정합니다.
+### 1. 프로젝트 열기
 
-실행과 F5는 활성 프로젝트의 **Build → Deploy → 실행 또는 디버깅** 순서로 동작합니다. 배포 단계를 등록하지 않았다면 복사 작업 없이 진행합니다. 변경이 없으면 빌드 도구가 재컴파일을 건너뛰며, 빌드가 실패하면 실행하지 않습니다.
+`Ctrl+Shift+P`에서 **Qt Pro: Open Project (.pro)**를 실행하고 `.pro` 또는 `CMakeLists.txt`를 선택합니다. 왼쪽 **Qt Projects**의 **+** 버튼으로도 추가할 수 있습니다.
 
-기존 디버그 구성이 있는 경우 VS Code의 **실행 및 디버그** 목록에서 **Qt Pro: 활성 프로젝트**를 선택하세요. F5는 현재 선택한 Debug/Release 구성을 사용하므로, 소스 중단점을 사용하려면 실행 파일에 해당 소스의 디버그 심벌이 있어야 합니다.
+파일을 편집기로 열면 기본적으로 프로젝트가 자동 등록됩니다. 여러 프로젝트를 함께 열어 둘 수 있으며, **Qt Pro: Open Recent Project**로 최근 프로젝트를 다시 열 수 있습니다.
 
-## 알아두면 좋은 동작
+### 2. 키트 선택하기
 
-- **빌드 대상:** 하단 버튼과 명령 팔레트는 활성 프로젝트를 사용합니다. `.pro` 우클릭 명령은 우클릭한 프로젝트를 대상으로 하며, 파일을 편집하거나 하위 프로젝트를 빌드해도 활성 프로젝트가 바뀌지 않습니다.
-- **빌드 위치:** qmake의 Shadow build는 기본적으로 꺼져 있어 `.pro` 폴더에서 빌드합니다. CMake는 기본적으로 `%LOCALAPPDATA%/QtProWorkbench/cmake-builds` 아래 별도 폴더를 사용합니다. 개인 설정의 저장 위치와 빌드 산출물의 위치는 별개입니다.
-- **프로젝트 트리:** qmake 파일을 정적으로 읽습니다. 사용자 함수·반복문·복잡한 치환으로 만든 파일 목록은 누락될 수 있으며 **Qt Pro: Show Project Parsing Notes**에서 확인할 수 있습니다. 실제 빌드는 qmake가 처리합니다.
-- **참조 검색:** 폴더 없이 연 프로젝트는 최초 검색 때 현재 창에 분석 폴더를 추가하고 확장 호스트를 다시 시작합니다. 열린 프로젝트와 저장하지 않은 파일 내용은 복원됩니다. 활성 디버그 세션이 있으면 종료한 뒤 최초 검색을 실행하세요.
-- **사용자 설정:** C/C++의 configuration provider와 공용 디버그 진입점을 사용자 설정에 등록합니다. 이전 provider는 **Qt Pro: Restore Previous C/C++ Provider**로 복원할 수 있습니다.
+하단 상태 표시줄의 **프로젝트 이름 ▾**를 눌러 **Project Settings**를 열고 사용할 프로젝트와 키트를 선택합니다.
 
-자세한 명령, 설정 항목과 Qt 4 디버깅 동작은 [사용 가이드](docs/USAGE.md)를 참고하세요.
+키트 목록이 비어 있거나 설치 경로가 다르면 **키트 관리…**를 엽니다. **설치된 Qt / CMake 자동 찾기**로 찾거나 직접 키트를 추가하고, 도구 경로를 확인한 뒤 **저장**하세요. 키트는 모든 프로젝트에서 공유하지만 사용할 키트의 선택은 프로젝트별로 유지됩니다.
 
-## Codex에서 사용
+첫 실행에서는 Qt Creator의 Desktop 키트 설정을 한 번 가져옵니다. Qt Creator가 없어도 키트를 직접 등록해 사용할 수 있습니다.
 
-설치 후 창을 다시 불러오면 로컬 제어 스크립트와 `vscode-qt-control` 스킬이 설치됩니다. 기존 동명 사용자 스킬은 덮어쓰지 않습니다.
+### 3. 빌드 구성 선택하기
 
-Codex에서 **$vscode-qt-control**을 지정하거나, `%LOCALAPPDATA%/QtProWorkbench/control-api/QtControl.ps1`의 `qt_list_instances`와 `help`로 시작하세요. 프로젝트·키트 선택, 빌드, 중단점 설정, 변수 조회와 단계 실행을 제어할 수 있습니다.
+하단 **Debug / Release ▾**에서 구성을 선택합니다. 소스 중단점을 사용하려면 보통 **Debug**를 선택합니다.
 
-호출 예제는 [CODEX-CONTROL.md](CODEX-CONTROL.md)에 있습니다.
+기본 빌드 위치는 프로젝트 형식에 따라 다릅니다.
 
-## 개발·패키징
+| 프로젝트 | 기본 빌드 위치 | 변경 방법 |
+| --- | --- | --- |
+| qmake | `.pro` 파일이 있는 폴더 | **Build Settings**에서 **Shadow build**를 켜고 별도 폴더 지정 |
+| CMake | `%LOCALAPPDATA%/QtProWorkbench/cmake-builds` 아래의 프로젝트·키트·구성별 폴더 | **Build Settings**에서 빌드 폴더 지정 |
 
-Node.js 22 이상과 PowerShell 7이 필요합니다. 저장소 루트에서 실행하세요.
+### 4. 빌드하고 실행하기
+
+| 작업 | 조작 |
+| --- | --- |
+| 빌드 | 하단 **프로젝트명 빌드** 또는 `Ctrl+Shift+B` |
+| 실행 | 하단 **▶** 또는 `Ctrl+F5` |
+| 디버깅 | 하단 디버그 버튼 또는 `F5` |
+| 상세 설정 | 하단 **프로젝트 이름 ▾** → **Build / Deploy / Run Settings** |
+
+실행과 디버깅은 **빌드 → 배포 단계(설정한 경우) → 프로그램 시작** 순서로 진행됩니다. 빌드가 실패하면 실행하지 않습니다. 변경이 없으면 빌드 도구가 불필요한 컴파일을 건너뜁니다.
+
+실행 파일이 여러 개이거나 별도 EXE를 실행하려면 **Run Settings**에서 실행 대상을 선택하세요. 실행 인수와 작업 폴더도 같은 화면에서 설정합니다. 예를 들어 인수에 `--mode "test run"`을 입력할 수 있으며, 작업 폴더를 비우면 EXE가 있는 폴더를 사용합니다.
+
+> **작업 대상 확인:** 하단 버튼과 단축키는 활성 프로젝트를 사용합니다. 프로젝트 파일의 우클릭 메뉴는 우클릭한 파일을 대상으로 합니다. 소스 파일을 편집하거나 하위 프로젝트를 우클릭해 빌드해도 활성 프로젝트가 자동으로 바뀌지는 않습니다.
+
+## 자주 사용하는 기능
+
+### 빌드 명령과 설정
+
+프로젝트 파일의 우클릭 메뉴나 하단 빌드 버튼 옆 **⌄**에서 빌드 작업을 선택합니다.
+
+| 명령 | qmake 프로젝트에서 하는 일 |
+| --- | --- |
+| Build Project | 사용할 수 있는 Makefile이 있으면 make를 실행하고, 없거나 설정이 맞지 않으면 qmake 후 빌드합니다. |
+| Run qmake | Makefile을 생성·갱신합니다. 컴파일은 하지 않습니다. |
+| Clean Project | 기존 Makefile의 `clean` 규칙으로 빌드 결과를 정리합니다. |
+| Rebuild Project | 기존 Makefile이 있으면 Clean을 실행한 뒤 qmake와 Build를 실행합니다. |
+
+CMake 프로젝트는 Configure에 `cmake -S … -B …`, 빌드와 정리에 `cmake --build`를 사용합니다. CMake 옵션은 **Build Settings**에 `-DNAME=value`, 빌드 대상은 빌드 인수에 `--target 대상이름`으로 지정합니다.
+
+qmake의 출력 경로(`DESTDIR`, `OBJECTS_DIR` 등)는 `.pro/.pri` 규칙을 따릅니다. **Build Settings**에서는 빌드 폴더, 인수, 환경변수와 사용자 빌드 구성을 관리합니다. **Deploy Settings**에서는 실행 전 파일·폴더 복사를 설정합니다. 배포는 변경된 파일을 복사하며 대상 폴더 전체를 동기화하거나 불필요한 파일을 삭제하지 않습니다.
+
+### 코드 탐색과 북마크
+
+| 기능 | 단축키 또는 위치 |
+| --- | --- |
+| 정의로 이동 / 정의 위치에서 선언으로 이동 | `F12`, `Ctrl+클릭` |
+| 정의 미리 보기 | `Alt+F12` |
+| 이동 전 위치로 돌아가기 | `Alt+←` |
+| 열린 프로젝트에서 참조 찾기 | `Shift+F12`, `Shift+Alt+F12` |
+| 열린 프로젝트에서 이름을 문자 그대로 검색 | **Qt Pro: 열린 프로젝트에서 이름 검색** |
+| 북마크 추가·해제 | `Ctrl+Alt+K` 또는 줄 번호 우클릭 → **Toggle Bookmark** |
+| 다음 / 이전 북마크 | `Ctrl+Alt+L` / `Ctrl+Alt+J` |
+
+참조 검색은 현재 파일과 같은 저장소 루트에 속한 열린 프로젝트를 대상으로 합니다. 이름 검색은 루트가 달라도 열린 프로젝트 전체를 대상으로 합니다.
+
+폴더 없이 시작한 창에서는 첫 참조 검색 시 C/C++ 색인에 필요한 분석 폴더를 현재 창에 추가합니다. 이때 확장 호스트가 다시 시작되지만 열린 프로젝트와 저장하지 않은 파일 내용은 유지합니다. 디버깅 중이라면 디버깅을 마친 뒤 첫 참조 검색을 실행하세요.
+
+**Qt Projects** 상단의 연결 고리 아이콘은 편집 중인 파일의 자동 선택을 켜고 끕니다. 북마크는 같은 사이드바의 **Bookmarks**에서 확인하고 이름을 붙일 수 있습니다.
+
+### Git 이력과 비교
+
+- 프로젝트 우클릭 → **Git Graph 보기**: 해당 저장소의 전체 커밋 그래프를 엽니다.
+- 파일·폴더 우클릭 → **Git 이력 조회**: 해당 경로의 커밋, 메시지, 변경 파일을 확인합니다. 파일명 변경 전 이력도 조회합니다.
+- 이력의 커밋이나 변경 파일 선택 → **수정 전 / 수정 후 비교**: VS Code 비교 편집기를 엽니다.
+- 파일 우클릭 → **최신 커밋과 비교**: `HEAD`의 파일과 현재 편집 내용을 비교합니다.
+
+이력 화면의 검색과 날짜 필터는 불러온 커밋에 적용됩니다. 더 오래된 내용을 찾으려면 이전 이력을 추가로 불러오세요.
+
+### 디버깅과 Codex 연동
+
+`F5`는 현재 선택한 빌드 구성과 **Run Settings**를 사용합니다. Release에서 시작해도 Debug로 강제 전환하지 않으며, 소스 중단점에는 실행 파일과 일치하는 디버그 심벌이 필요합니다.
+
+Qt 4.8.1용 변수 표시기를 포함하고 있어 지원되는 GDB 환경에서 `QString`, `QByteArray`, Qt 컨테이너 등의 값을 확인할 수 있습니다. 세부 지원 범위는 사용 가이드를 참고하세요.
+
+Codex 연동을 사용하면 로컬 API로 프로젝트 선택, 빌드, 중단점, 스택·변수 조회와 디버거 실행 제어를 할 수 있습니다. 호출 방법은 [Codex 제어 안내](CODEX-CONTROL.md)에 정리되어 있으며, VS Code의 **Qt Pro: Codex Control Guide**에서도 열 수 있습니다.
+
+## 설정 저장 위치와 지원 범위
+
+키트, 최근 프로젝트, 프로젝트별 구성, 실행·배포 설정과 북마크는 VS Code 개인 저장소에 보관됩니다. 일반 설치의 기본 위치는 다음과 같으며, VS Code 프로필과 실행 옵션에 따라 달라질 수 있습니다.
+
+```text
+%APPDATA%/Code/User/globalStorage/ynlim.qt-pro-workbench/
+```
+
+프로젝트에 `.vscode`, `.qtide`, `.code-workspace` 설정 파일을 만들지 않습니다. 다만 **빌드 산출물은 빌드 폴더와 프로젝트 규칙에 따라 생성**됩니다. 프로젝트 경로가 같으면 브랜치를 바꿔도 개인 설정을 유지합니다. 선택한 도구 경로는 실행 프로세스에 적용하며 시스템 PATH는 변경하지 않습니다.
+
+qmake 프로젝트 트리는 파일을 정적으로 읽어 구성합니다. 복잡한 사용자 함수·반복문·치환식의 결과는 일부 누락될 수 있습니다. **Qt Pro: Show Project Parsing Notes**에서 해석하지 못한 경로를 확인하세요. 실제 빌드는 qmake가 원래 프로젝트 규칙을 해석합니다.
+
+이 확장은 UI 디자이너나 Qt Creator의 전체 코드 모델을 제공하지 않습니다. IntelliSense와 C/C++ 디버깅에는 Microsoft C/C++ 확장을 사용합니다.
+
+## 문제가 생겼을 때
+
+| 증상 | 확인할 내용 |
+| --- | --- |
+| 키트가 없거나 도구를 찾지 못함 | **Kit Settings**에서 qmake·컴파일러·make·GDB 또는 CMake 도구 경로와 버전·아키텍처를 확인합니다. |
+| 빌드 실패 | VS Code 작업 터미널의 첫 오류를 확인합니다. 빌드 중단은 터미널의 작업 종료 버튼을 사용합니다. |
+| CMake 생성기·컴파일러 변경 후 캐시 충돌 | **Build Settings**에서 새 빌드 폴더를 지정합니다. |
+| 실행 파일을 찾지 못함 | 빌드 성공 여부와 **Run Settings**의 실행 대상을 확인합니다. Custom Executable은 직접 EXE 경로를 지정해야 합니다. |
+| 중단점이 동작하지 않음 | 선택한 구성, 디버그 심벌, 소스와 EXE의 일치 여부, 키트 디버거 경로를 확인합니다. |
+| 헤더를 찾지 못하거나 분석 설정이 맞지 않음 | 프로젝트 키트를 확인하고 한 번 빌드합니다. 빌드 후 생성된 도구 정보를 분석에 반영합니다. |
+| 업데이트한 기능이 보이지 않음 | **Developer: Reload Window**를 실행합니다. 디버거 변경은 새 디버그 세션에서 확인합니다. |
+
+저장소의 [사용 가이드](docs/USAGE.md)에서 세부 설정을 확인할 수 있습니다. VS Code에서 이 README를 다시 열려면 **Qt Pro: Open Usage Guide**를 실행하세요.
+
+## 소스에서 빌드하기
+
+확장을 개발하거나 VSIX를 직접 만들 때 사용하는 절차입니다. **Node.js 22 이상**과 **PowerShell 7(`pwsh`)**이 필요합니다.
+
+저장소 루트에서 실행합니다.
 
 ```powershell
 npm ci
 npm test
 pwsh -NoProfile -File ./Package.ps1
-powershell -NoProfile -ExecutionPolicy Bypass -File ./test/Test-VsixPackage.ps1 -PackagePath ./qt-pro-workbench-0.12.4.vsix
 ```
 
-`Package.ps1`은 `package.json`의 버전으로 VSIX를 생성합니다. 마지막 명령의 파일명은 생성된 패키지 버전에 맞추세요. 패키지 검증은 .NET 판독기로 콘텐츠 형식, 필수 파일, 설치 대상과 버전 일치를 확인합니다.
+`npm test`는 TypeScript 컴파일과 단위 테스트를 실행합니다. 패키징 결과는 저장소 루트의 `qt-pro-workbench-<버전>.vsix`이며, 버전은 `package.json`에서 읽습니다.
 
-`npm test`는 TypeScript 컴파일과 단위 테스트를 실행합니다. `test/*integration.cjs`는 별도 VS Code 시험 창에서 실행하는 통합 검증입니다. 일부는 개발 PC의 Qt SDK나 프로젝트 경로에 의존하므로, 해당 환경에 맞춰 경로를 지정한 뒤 필요한 검증을 실행하세요.
+생성한 패키지는 Windows PowerShell에서 검증할 수 있습니다. 아래 경로는 실제 생성된 파일명으로 바꾸세요.
 
-npm 런타임 패키지는 사용하지 않습니다. Git에는 소스·리소스·테스트·설정·문서를 포함하고, `node_modules/`, `out/`, VSIX와 생성된 테스트 결과·개인 프로필은 제외합니다.
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File ./test/Test-VsixPackage.ps1 -PackagePath ./qt-pro-workbench-<버전>.vsix
+```
 
-## 문서·라이선스
+`test/*integration.cjs`는 별도 VS Code 시험 창을 사용하는 통합 검증입니다. 일부는 특정 Qt SDK나 개발 PC의 프로젝트 경로를 전제로 하므로 실행 전 환경과 경로를 확인해야 합니다.
 
-- [사용 가이드](docs/USAGE.md): 프로젝트 탐색, 키트, 빌드·배포·실행, 디버깅과 개인 설정
-- [Codex 제어 가이드](CODEX-CONTROL.md): 로컬 API와 호출 예제
-- [MIT 라이선스](LICENSE)
+| 경로 | 역할 |
+| --- | --- |
+| `src/` | 확장의 TypeScript 소스 |
+| `media/` | 설정 화면, 아이콘, 디버거 및 제어 보조 파일 |
+| `docs/USAGE.md` | 상세 사용 가이드 |
+| `test/` | 단위·통합 테스트와 테스트용 프로젝트 |
+| `Package.ps1` | VSIX 패키징 스크립트 |
+| `CODEX-CONTROL.md` | Codex 로컬 제어 API 안내 |
+
+`node_modules/`, 컴파일 결과 `out/`, VSIX와 생성된 테스트 결과는 Git에서 제외합니다.
+
+## 라이선스
+
+[MIT](LICENSE)

@@ -21,6 +21,10 @@ Project follow means **selecting the currently viewed file in the tree**, while 
 | Qt Pro references | Shift+F12 or Shift+Alt+F12, **Qt Pro: 모든 참조 찾기 (열린 프로젝트)**, `qtPro.findReferences` |
 | Explicit name search | **Qt Pro: 열린 프로젝트에서 이름 검색**, `qtPro.findName` |
 | Bookmark toggle | Ctrl+Alt+K or line-number context menu, `qtPro.toggleBookmark` |
+| Project Git graph | Project right-click **Git Graph 보기**, `qtPro.showGitHistory`; read [git-history.md](git-history.md) for history tasks. |
+| File / folder Git history | File or folder right-click **Git 이력 조회**, `qtPro.showFileGitHistory`; folder logs include all descendants and scoped changed paths. |
+| Local file vs latest commit | File right-click **최신 커밋과 비교**, `qtPro.compareLatestGitRevision`; compares repository HEAD with current unsaved source. |
+| Show local path in Windows Explorer | Project/file/folder right-click **탐색기에서 열기**, `qtPro.revealInExplorer`; files are selected in their containing folder. |
 | Next / previous bookmark | Ctrl+Alt+L / Ctrl+Alt+J |
 | Reload after extension update | **Developer: Reload Window**, `workbench.action.reloadWindow` |
 

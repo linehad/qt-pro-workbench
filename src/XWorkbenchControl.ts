@@ -1,4 +1,5 @@
 import * as vscode from "vscode";
+import * as path from "node:path";
 import { randomUUID } from "node:crypto";
 import { TXDebugControl } from "./XDebugControl";
 import { controlBoolean, controlInteger, controlPath, controlString } from "./XControlValidation";
@@ -38,6 +39,10 @@ export class TXWorkbenchControl implements vscode.Disposable {
 
     private async dispatch(operation: string, args: Record<string, unknown>): Promise<unknown> {
         if (operation === "qt_get_state") { return this.state(); }
+        if (operation.startsWith("qt_git_")) {
+            if (!this.info.git) { throw new Error("이 창에서는 Git 이력 제어를 사용할 수 없습니다."); }
+            return this.info.git(operation, args);
+        }
         if (operation === "qt_get_job") {
             const job = this.jobs.get(controlString(args, "jobId"));
             if (!job) { throw new Error("이 창의 작업 ID를 지정하세요."); }
@@ -57,6 +62,14 @@ export class TXWorkbenchControl implements vscode.Disposable {
             await this.info.openProject(project); return this.state();
         }
         const state = this.info.state();
+        if (operation === "qt_close_project") {
+            const requested = controlPath(args, "projectPath");
+            const project = state.projects.find(item => path.resolve(item.projectPath).toLowerCase() === requested.toLowerCase());
+            if (!project) { throw new Error("qt_get_state.projects에 있는 열린 프로젝트 경로를 지정하세요."); }
+            if (!this.info.closeProject) { throw new Error("이 창에서는 프로젝트 닫기를 사용할 수 없습니다."); }
+            await this.info.closeProject(project.projectPath);
+            return this.state();
+        }
         if (!state.activeProject) { throw new Error("qt_select_project로 프로젝트를 먼저 선택하세요."); }
         if (operation === "qt_select_kit") { await this.info.select({ field: "kit", value: controlString(args, "kitId") }); return this.state(); }
         if (!state.kitId) { throw new Error("qt_select_kit으로 키트를 먼저 선택하세요."); }

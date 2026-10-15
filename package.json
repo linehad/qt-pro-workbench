@@ -2,7 +2,7 @@
     "name": "qt-pro-workbench",
     "displayName": "Qt Pro Workbench (Local)",
     "description": "Local qmake/CMake project tree, Qt/compiler kits, build settings, incremental builds and debugging. Settings stay outside projects.",
-    "version": "0.12.4",
+    "version": "0.12.12",
     "publisher": "ynlim",
     "private": true,
     "license": "MIT",
@@ -12,7 +12,7 @@
     "extensionKind": ["ui"],
     "capabilities": { "untrustedWorkspaces": { "supported": "limited", "description": "파일 트리만 제공하며 신뢰하지 않는 프로젝트의 빌드는 실행하지 않습니다." } },
     "activationEvents": ["onStartupFinished", "onLanguage:qmake", "onLanguage:cmake", "onDebugResolve:qt-pro"],
-    "extensionDependencies": ["ms-vscode.cpptools"],
+    "extensionDependencies": ["ms-vscode.cpptools", "mhutchie.git-graph"],
     "contributes": {
         "languages": [{ "id": "qmake", "aliases": ["Qt qmake", "qmake"], "extensions": [".pro", ".pri"], "configuration": "language-configuration.json" }, { "id": "cmake", "aliases": ["CMake", "cmake"], "filenames": ["CMakeLists.txt"], "extensions": [".cmake"], "configuration": "language-configuration.json" }],
         "grammars": [{ "language": "qmake", "scopeName": "source.qmake", "path": "media/qmake.tmLanguage.json" }, { "language": "cmake", "scopeName": "source.cmake", "path": "media/cmake.tmLanguage.json" }],
@@ -25,6 +25,10 @@
         "views": { "qtProReferenceResults": [{ "id": "qtProReferences", "name": "References", "when": "qtPro.hasReferences" }], "qtProWorkbench": [{ "id": "qtProProjects", "name": "Qt Projects" }, { "id": "qtProBookmarks", "name": "Bookmarks" }] },
         "viewsWelcome": [{ "view": "qtProBookmarks", "contents": "줄 번호 우클릭 → Toggle Bookmark\nCtrl+Alt+K로 북마크를 추가·해제합니다." }, { "view": "qtProProjects", "contents": "폴더를 열지 않아도 .pro / CMakeLists.txt 파일로 시작할 수 있습니다.\n[프로젝트 열기](command:qtPro.openProject)\n[최근 프로젝트](command:qtPro.openRecent)" }],
         "commands": [
+            { "command": "qtPro.showGitHistory", "title": "Git Graph 보기", "category": "Qt Pro", "icon": "$(git-commit)" },
+            { "command": "qtPro.showFileGitHistory", "title": "Git 이력 조회", "category": "Qt Pro", "icon": "$(history)" },
+            { "command": "qtPro.compareLatestGitRevision", "title": "최신 커밋과 비교", "category": "Qt Pro", "icon": "$(diff)" },
+            { "command": "qtPro.revealInExplorer", "title": "탐색기에서 열기", "category": "Qt Pro", "icon": "$(folder-opened)" },
             { "command": "qtPro.findReferences", "title": "모든 참조 찾기 (열린 프로젝트)", "category": "Qt Pro" },
             { "command": "qtPro.refreshReferences", "title": "Refresh References", "category": "Qt Pro", "icon": "$(refresh)" },
             { "command": "qtPro.findName", "title": "열린 프로젝트에서 이름 검색", "category": "Qt Pro" },
@@ -72,6 +76,8 @@
             ],
             "editor/lineNumber/context": [{ "command": "qtPro.toggleBookmark", "when": "resourceScheme == file", "group": "qtPro@1" }],
             "editor/context": [
+                { "command": "qtPro.showFileGitHistory", "when": "resourceScheme == file", "group": "qtPro@3" },
+                { "command": "qtPro.compareLatestGitRevision", "when": "resourceScheme == file", "group": "qtPro@3.1" },
                 { "command": "qtPro.findReferences", "when": "editorLangId =~ /^(c|cpp)$/ && qtPro.hasActiveProject", "group": "navigation@1.1" },
                 { "command": "qtPro.findName", "when": "editorLangId =~ /^(c|cpp)$/ && qtPro.hasActiveProject", "group": "navigation@1.2" },
                 { "command": "qtPro.toggleBookmark", "when": "resourceScheme == file", "group": "qtPro@1" },
@@ -87,6 +93,10 @@
                 { "command": "qtPro.refresh", "when": "view == qtProProjects", "group": "navigation@5" }
             ],
             "view/item/context": [
+                { "command": "qtPro.showGitHistory", "when": "view == qtProProjects && viewItem =~ /^(qtProProject|qtProProjectFile)$/", "group": "git@1" },
+                { "command": "qtPro.showFileGitHistory", "when": "view == qtProProjects && viewItem =~ /^(qtProProject|qtProSourceFile|qtProProjectFile|qtProInclude|qtProFolder)$/", "group": "git@2" },
+                { "command": "qtPro.compareLatestGitRevision", "when": "view == qtProProjects && viewItem =~ /^(qtProSourceFile|qtProProjectFile|qtProInclude)$/", "group": "git@2.1" },
+                { "command": "qtPro.revealInExplorer", "when": "view == qtProProjects && viewItem =~ /^(qtProProject|qtProProjectFile|qtProSourceFile|qtProInclude|qtProFolder)$/", "group": "git@3" },
                 { "command": "qtPro.renameBookmark", "when": "view == qtProBookmarks && viewItem == qtProBookmark", "group": "bookmark@1" },
                 { "command": "qtPro.removeBookmark", "when": "view == qtProBookmarks", "group": "inline@2" },
                 { "command": "qtPro.selectActiveProject", "when": "view == qtProProjects && viewItem == qtProProject", "group": "project@1" },
@@ -107,6 +117,8 @@
             ],
             "editor/title": [{ "command": "qtPro.openProject", "when": "(resourceExtname == .pro || resourceFilename == CMakeLists.txt)", "group": "navigation" }],
             "explorer/context": [
+                { "command": "qtPro.showFileGitHistory", "when": "resourceScheme == file", "group": "git@1" },
+                { "command": "qtPro.compareLatestGitRevision", "when": "resourceScheme == file && !explorerResourceIsFolder", "group": "git@1.1" },
                 { "command": "qtPro.openProject", "when": "(resourceExtname == .pro || resourceFilename == CMakeLists.txt) && resourceScheme == file && !explorerResourceIsFolder", "group": "navigation" },
                 { "command": "qtPro.build", "when": "(resourceExtname == .pro || resourceFilename == CMakeLists.txt) && resourceScheme == file && !explorerResourceIsFolder", "group": "qtPro@1" },
                 { "command": "qtPro.qmake", "when": "(resourceExtname == .pro || resourceFilename == CMakeLists.txt) && resourceScheme == file && !explorerResourceIsFolder", "group": "qtPro@2" },
@@ -154,5 +166,6 @@
         ]
     },
     "scripts": { "compile": "tsc -p .", "test": "npm run compile && node --test test/*.test.cjs" },
-    "devDependencies": { "@types/node": "^22.0.0", "@types/vscode": "^1.100.0", "typescript": "~5.9.3" }
+    "devDependencies": { "@types/node": "^22.0.0", "@types/vscode": "^1.100.0", "typescript": "~5.9.3" },
+    "dependencies": { "iconv-lite": "0.6.3" }
 }

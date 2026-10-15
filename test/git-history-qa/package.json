@@ -1,0 +1,5 @@
+{
+    "name": "git-history-qa", "publisher": "qt-pro-qa", "version": "1.0.0",
+    "engines": { "vscode": "^1.100.0" }, "main": "./main.cjs",
+    "activationEvents": ["onStartupFinished"], "extensionDependencies": ["ynlim.qt-pro-workbench", "mhutchie.git-graph"]
+}

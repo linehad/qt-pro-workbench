@@ -16,6 +16,8 @@ Thumbs.db
 !/test/XQt4PrinterChecks.py
 !/test/folderless-reference-qa/
 !/test/folderless-reference-qa/**
+!/test/git-history-qa/
+!/test/git-history-qa/**
 !/test/target source/
 !/test/target source/**
 !/test/run source/

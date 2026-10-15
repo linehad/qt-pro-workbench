@@ -2,7 +2,20 @@ $ErrorActionPreference = 'Stop'
 $sourceRoot = $PSScriptRoot
 $packageMetadata = Get-Content -LiteralPath (Join-Path $sourceRoot 'package.json') -Raw | ConvertFrom-Json
 $packageVersion = $packageMetadata.version
+$packageDependencies = $packageMetadata.extensionDependencies -join ','
 $packagePath = Join-Path $sourceRoot "qt-pro-workbench-$packageVersion.vsix"
+$runtimeFiles = @()
+$runtimeNames = [System.Collections.Generic.Queue[string]]::new()
+$runtimeIncluded = [System.Collections.Generic.HashSet[string]]::new()
+foreach ($dependency in $packageMetadata.dependencies.PSObject.Properties) { $runtimeNames.Enqueue($dependency.Name) }
+while ($runtimeNames.Count) {
+    $dependencyName = $runtimeNames.Dequeue()
+    if (-not $runtimeIncluded.Add($dependencyName)) { continue }
+    $dependencyRoot = Join-Path $sourceRoot "node_modules/$dependencyName"
+    $dependencyMetadata = Get-Content -LiteralPath (Join-Path $dependencyRoot 'package.json') -Raw | ConvertFrom-Json
+    $runtimeFiles += Get-ChildItem -LiteralPath $dependencyRoot -File -Recurse | Where-Object { $_.FullName.Substring($dependencyRoot.Length) -notmatch '[/\\]\.' } | ForEach-Object { [System.IO.Path]::GetRelativePath($sourceRoot, $_.FullName) }
+    foreach ($dependency in $dependencyMetadata.dependencies.PSObject.Properties) { $runtimeNames.Enqueue($dependency.Name) }
+}
 Add-Type -AssemblyName System.IO.Compression
 $packageStream = [System.IO.File]::Open($packagePath, [System.IO.FileMode]::Create)
 $archive = [System.IO.Compression.ZipArchive]::new($packageStream, [System.IO.Compression.ZipArchiveMode]::Create)
@@ -15,6 +28,11 @@ function Add-PackageText([string]$name, [string]$text) {
 try {
     $contentTypes = '<?xml version="1.0" encoding="utf-8"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="json" ContentType="application/json"/><Default Extension="css" ContentType="text/css"/><Default Extension="js" ContentType="application/javascript"/><Default Extension="map" ContentType="application/json"/><Default Extension="ts" ContentType="text/plain"/><Default Extension="py" ContentType="text/plain"/><Default Extension="md" ContentType="text/markdown"/><Default Extension="svg" ContentType="image/svg+xml"/><Default Extension="ps1" ContentType="text/plain"/><Default Extension="vsixmanifest" ContentType="text/xml"/><Override PartName="/extension/LICENSE" ContentType="text/plain"/></Types>'
     $contentTypes = $contentTypes.Replace('</Types>', '<Default Extension="yaml" ContentType="text/plain"/></Types>')
+    foreach ($relativePath in $runtimeFiles) {
+        if ([System.IO.Path]::GetExtension($relativePath)) { continue }
+        $partName = [System.Security.SecurityElement]::Escape('/extension/' + $relativePath.Replace('\', '/'))
+        $contentTypes = $contentTypes.Replace('</Types>', "<Override PartName=`"$partName`" ContentType=`"text/plain`"/></Types>")
+    }
     Add-PackageText '[Content_Types].xml' $contentTypes
     $manifest = @"
 <?xml version="1.0" encoding="utf-8"?>
@@ -26,7 +44,7 @@ try {
     <Tags>qt,qmake,pro,cmake</Tags><Categories>Other</Categories><GalleryFlags>Public</GalleryFlags>
     <Properties>
       <Property Id="Microsoft.VisualStudio.Code.Engine" Value="^1.100.0" />
-      <Property Id="Microsoft.VisualStudio.Code.ExtensionDependencies" Value="ms-vscode.cpptools" />
+      <Property Id="Microsoft.VisualStudio.Code.ExtensionDependencies" Value="$packageDependencies" />
       <Property Id="Microsoft.VisualStudio.Code.ExtensionPack" Value="" />
       <Property Id="Microsoft.VisualStudio.Code.ExtensionKind" Value="ui" />
     </Properties>
@@ -43,6 +61,7 @@ try {
 "@
     Add-PackageText 'extension.vsixmanifest' $manifest
     $files = @('package.json', 'README.md', 'CODEX-CONTROL.md', 'LICENSE', 'tsconfig.json', 'Package.ps1', 'package-lock.json', 'language-configuration.json')
+    $files += $runtimeFiles
     foreach ($folder in @('out', 'src', 'media')) {
         $files += Get-ChildItem -LiteralPath (Join-Path $sourceRoot $folder) -File -Recurse | ForEach-Object { [System.IO.Path]::GetRelativePath($sourceRoot, $_.FullName) }
     }

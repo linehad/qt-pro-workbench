@@ -1,6 +1,6 @@
 # Qt Pro: Codex 제어
 
-Qt Pro 0.12.4는 VS Code 공식 확장 API로 프로젝트 선택, 빌드, 중단점, 스택과 변수 조회, 디버깅 제어를 제공합니다. MCP 등록이나 별도 서버 프로세스가 필요하지 않습니다. Qt Pro가 실행된 VS Code 확장 호스트에 로컬 파이프로 요청을 전달하며 외부 네트워크 포트를 열지 않습니다.
+Qt Pro 0.12.12은 VS Code 공식 확장 API로 프로젝트 선택·닫기, 빌드, 중단점, 스택과 변수 조회, 디버깅 제어와 파일·폴더 Git 이력 탐색을 제공합니다. MCP 등록이나 별도 서버 프로세스가 필요하지 않습니다. Qt Pro가 실행된 VS Code 확장 호스트에 로컬 파이프로 요청을 전달하며 외부 네트워크 포트를 열지 않습니다.
 
 VSIX 설치 후 **Developer: Reload Window**를 실행하세요. Windows의 호출 스크립트는 `%LOCALAPPDATA%/QtProWorkbench/control-api/QtControl.ps1`에 자동 설치됩니다. 별도 Node 설치 없이 VS Code의 런타임을 사용합니다. Codex에서는 아래 명령으로 창과 API를 조회할 수 있습니다.
 
